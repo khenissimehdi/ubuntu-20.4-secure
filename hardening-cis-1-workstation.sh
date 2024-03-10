@@ -89,7 +89,7 @@ logging "" "Download complete!"
 
 
 logging "" "Unzipping $ZIP_FILE"
-sudo unzip "$TARGET_DIR/$ZIP_FILE" || exit_on_error "Failed to unzip $ZIP_FILE"
+sudo unzip "$TARGET_DIR/$ZIP_FILE" -d "$TARGET_DIR" || exit_on_error "Failed to unzip $ZIP_FILE"
 
 logging "" "Operation complete!"
 

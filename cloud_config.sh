@@ -16,8 +16,8 @@ apt-get update && apt-get upgrade -y
 apt-get install -y fail2ban
 
 # Create user with specified groups, shell, and add to sudoers without password
-adduser --disabled-login --shell /bin/bash $USERNAME
-usermod -a -G users,admin $USERNAME
+adduser --disabled-login --shell /bin/bash --gecos "" "$USERNAME"
+usermod -a -G users,sudo $USERNAME
 echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Add the public SSH key to the authorized_keys
@@ -27,16 +27,7 @@ chmod 700 /home/$USERNAME/.ssh
 chmod 600 /home/$USERNAME/.ssh/authorized_keys
 chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh
 
-# SSHD Configurations
-sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)ChallengeResponseAuthentication/s/^.*$/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)MaxAuthTries/s/^.*$/MaxAuthTries 2/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)AllowTcpForwarding/s/^.*$/AllowTcpForwarding no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
-echo "AllowUsers $USERNAME" >> /etc/ssh/sshd_config
+
 
 # Configure fail2ban
 echo "[sshd]" > /etc/fail2ban/jail.local
@@ -51,6 +42,10 @@ systemctl start fail2ban
 systemctl restart sshd
 
 # Optionally, reboot the system at the end of the script
-# reboot
+reboot
+
+# SSHD Configurations
+
+echo "AllowUsers $USERNAME" >> /etc/ssh/sshd_config
 
 echo "Configuration complete."
